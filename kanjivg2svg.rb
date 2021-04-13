@@ -14,13 +14,14 @@ class Importer
     HEIGHT = 109 # 109 per character
     SVG_HEAD = "<svg width=\"__WIDTH__px\" height=\"#{HEIGHT}px\" viewBox=\"0 0 __VIEW_WIDTH__px #{HEIGHT}px\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" version=\"1.1\"  baseProfile=\"full\">"
     SVG_FOOT = '</svg>'
-    TEXT_STYLE = 'fill:#FF2A00;font-family:Helvetica;font-weight:normal;font-size:14;stroke-width:0'
+    TEXT_STYLE = 'fill:#34a83c;font-family:Helvetica;font-weight:normal;font-size:14;stroke-width:0'
     PATH_STYLE = 'fill:none;stroke:black;stroke-width:3'
     INACTIVE_PATH_STYLE = 'fill:none;stroke:#999;stroke-width:3'
     LINE_STYLE = 'stroke:#ddd;stroke-width:2'
     DASHED_LINE_STYLE = 'stroke:#ddd;stroke-width:2;stroke-dasharray:3 3'
     ENTRY_NAME = 'svg'
     COORD_RE = %r{(?ix:\d+ (?:\.\d+)?)}
+    STROKE_SETTINGS = 'class="draw2" stroke-linejoin="round" stroke="black" fill="none" stroke-width="5"'
 
     def initialize(doc, output_dir, type = :numbers)
       @output_dir = output_dir
@@ -95,15 +96,16 @@ class Importer
       end
 
       # Draw the strokes
+      totalDelay = 0.0
       entry.css('path[d]').each do |stroke|
         paths << stroke['d']
         stroke_count += 1
 
         case @type
         when :animated
-          svg << "<path d=\"#{stroke['d']}\" style=\"#{PATH_STYLE};opacity:0\">\n"
-          svg << "  <animate attributeType=\"CSS\" attributeName=\"opacity\" from=\"0\" to=\"1\" begin=\"#{stroke_count-1}s\" dur=\"1s\" repeatCount=\"0\" fill=\"freeze\" />\n"
-          svg << "</path>\n"
+          svg << "<path style=\"animation-delay: #{totalDelay.round(2)}s;\" #{STROKE_SETTINGS} d=\"#{stroke['d']}\">\n"
+          svg << "</path>\n"y
+          totalDelay += 0.8
         when :numbers
           x, y = move_text_relative_to_path(stroke['d'])
           svg << "<text x=\"#{x}\" y=\"#{y}\" style=\"#{TEXT_STYLE}\">#{stroke_count}</text>\n"
@@ -148,7 +150,7 @@ class Importer
           end
 
           # Put a circle at the stroke start
-          svg << "<circle cx=\"#{path_start_x}\" cy=\"#{path_start_y}\" r=\"5\" stroke-width=\"0\" fill=\"#FF2A00\" opacity=\"0.7\" />"
+          svg << "<circle cx=\"#{path_start_x}\" cy=\"#{path_start_y}\" r=\"5\" stroke-width=\"0\" fill=\"#34a83c\" opacity=\"0.7\" />"
           svg << "\n"
         end
       end
@@ -187,6 +189,7 @@ puts "Starting the conversion @ #{Time.now} ..."
 
 Dir["#{input_dir}*.svg"].each do |file|
   begin
+    puts "file: "+ file
     Importer::KanjiVG.new(File.open(file), output_dir, type.to_sym)
   rescue => e
     puts "Failed to process file: #{file}"
