@@ -10,7 +10,19 @@ Usage
 
 You can change the output type by setting the second argument. If not set it will default to 'frames'. The animated and numbers are less perfected compared to the frames output.
 
-In this repo I've included svg files generated with the 'frames' option.
+For the animation to work, the generated svg cannot be loaded as an image.
+
+source html needs to contains the following css:
+```
+.draw2 {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: dash2 1s linear forwards;
+}
+@keyframes dash2 {
+  to { stroke-dashoffset: 0;}
+}  
+```
 
 License
 -------
