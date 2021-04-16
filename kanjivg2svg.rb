@@ -1,7 +1,4 @@
 # Encoding: UTF-8
-# By: Kim Ahlström <kim.ahlstrom@gmail.com>
-# License: Creative Commons Attribution-Share Alike 3.0 - http://creativecommons.org/licenses/by-sa/3.0/
-# KanjiVG is copyright (c) 2009/2010 Ulrich Apel and released under the Creative Commons Attribution-Share Alike 3.0
 
 require 'rubygems'
 require 'nokogiri'
@@ -12,7 +9,7 @@ class Importer
 
     WIDTH = 109 # 109 per character
     HEIGHT = 109 # 109 per character
-    SVG_HEAD = "<svg width=\"__WIDTH__px\" height=\"#{HEIGHT}px\" viewBox=\"0 0 __VIEW_WIDTH__px #{HEIGHT}px\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" version=\"1.1\"  baseProfile=\"full\">"
+    SVG_HEAD = "<svg id=\"kanjisvg\" width=\"__WIDTH__px\" height=\"#{HEIGHT}px\">"
     SVG_FOOT = '</svg>'
     TEXT_STYLE = 'fill:#34a83c;font-family:Helvetica;font-weight:normal;font-size:14;stroke-width:0'
     PATH_STYLE = 'fill:none;stroke:black;stroke-width:3'
@@ -50,15 +47,10 @@ class Importer
     private
 
     def parse(doc)
-      codepoint = nil
       entry = doc.css('g')[1]
-      if entry['kvg:element'].nil?
-        codepoint = entry['id'].split(':')[1].to_i(16) # get it from the id="kvg:0abcd"
-      else
-        codepoint = entry['kvg:element'].codepoints.first
-      end
+      kanji = entry['kvg:element']
 
-      svg = File.open("#{@output_dir}/#{codepoint}_#{@type}.svg", File::RDWR|File::TRUNC|File::CREAT)
+      svg = File.open("#{@output_dir}/#{kanji}_#{@type}.svg", File::RDWR|File::TRUNC|File::CREAT)
       stroke_count = 0
       stroke_total = entry.css('path[d]').length
       paths = []
@@ -104,8 +96,14 @@ class Importer
         case @type
         when :animated
           svg << "<path style=\"animation-delay: #{totalDelay.round(2)}s;\" #{STROKE_SETTINGS} d=\"#{stroke['d']}\">\n"
-          svg << "</path>\n"y
+          svg << "</path>\n"
+
+          delay = stroke['d'].length / 75.0
+          puts "Delay:", delay
           totalDelay += 0.8
+          puts "totalDelay:", totalDelay
+          
+          
         when :numbers
           x, y = move_text_relative_to_path(stroke['d'])
           svg << "<text x=\"#{x}\" y=\"#{y}\" style=\"#{TEXT_STYLE}\">#{stroke_count}</text>\n"
