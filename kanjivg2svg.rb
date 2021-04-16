@@ -1,4 +1,7 @@
 # Encoding: UTF-8
+# By: Kim Ahlström <kim.ahlstrom@gmail.com>
+# License: Creative Commons Attribution-Share Alike 3.0 - http://creativecommons.org/licenses/by-sa/3.0/
+# KanjiVG is copyright (c) 2009/2010 Ulrich Apel and released under the Creative Commons Attribution-Share Alike 3.0
 
 require 'rubygems'
 require 'nokogiri'
@@ -9,7 +12,7 @@ class Importer
 
     WIDTH = 109 # 109 per character
     HEIGHT = 109 # 109 per character
-    SVG_HEAD = "<svg id=\"kanjisvg\" width=\"__WIDTH__px\" height=\"#{HEIGHT}px\">"
+    SVG_HEAD = "<svg id=\"kanjisvg\" width=\"__WIDTH__px\" height=\"#{HEIGHT}px\" viewBox=\"0 0 __VIEW_WIDTH__px #{HEIGHT}px\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\" version=\"1.1\"  baseProfile=\"full\">"
     SVG_FOOT = '</svg>'
     TEXT_STYLE = 'fill:#34a83c;font-family:Helvetica;font-weight:normal;font-size:14;stroke-width:0'
     PATH_STYLE = 'fill:none;stroke:black;stroke-width:3'
